@@ -2,7 +2,34 @@
 
 This document describes C code style used by Tilen MAJERLE in his projects and libraries.
 
-# General rules
+## Table of Contents
+
+  - [The single most important rule](#the-single-most-important-rule)
+  - [Recommended C style and coding rules](#recommended-c-style-and-coding-rules)
+  - [General rules](#general-rules)
+  - [Comments](#comments)
+  - [Functions](#functions)
+  - [Variables](#variables)
+  - [Structures, enumerations, typedefs](#structures-enumerations-typedefs)
+  - [Compound statements](#compound-statements)
+    - [Switch statement](#switch-statement)
+  - [Macros and preprocessor directives](#macros-and-preprocessor-directives)
+  - [Documentation](#documentation)
+  - [Header/source files](#headersource-files)
+  - [Artistic Style configuration](#artistic-style-configuration)
+  - [Eclipse formatter](#eclipse-formatter)
+
+## The single most important rule
+
+Let's start with the quote from [GNOME developer](https://developer.gnome.org/programming-guidelines/stable/c-coding-style.html.en) site.
+
+> The single most important rule when writing code is this: *check the surrounding code and try to imitate it*.
+>
+> As a maintainer it is dismaying to receive a patch that is obviously in a different coding style to the surrounding code. This is disrespectful, like someone tromping into a spotlessly-clean house with muddy shoes.
+>
+> So, whatever this document recommends, if there is already written code and you are patching it, keep its current style consistent even if it is not your favorite style.
+
+## General rules
 
 Here are listed most obvious and important general rules. Please check them carefully before you continue with other chapters.
 
@@ -228,14 +255,14 @@ send_data(const void* data, int len) {    /* Wrong, not not use int */
 }
 ```
 
+- Always use brackets with `sizeof` operator
 - Never use *Variable Length Array* (VLA). Use dynamic memory allocation instead with standard C `malloc` and `free` functions or if library/project provides custom memory allocation, use its implementation
     - Take a look at [LwMEM](https://github.com/MaJerle/lwmem), custom memory management library
-
-- Always use brackets with `sizeof` operator.
 ```c
 /* OK */
 #include <stdlib.h>
-void my_func(size_t size) {
+void
+my_func(size_t size) {
     int32_t* arr;
     arr = malloc(sizeof(*arr) * n); /* OK, Allocate memory */
     arr = malloc(sizeof *arr * n);  /* Wrong, brackets for sizeof operator are missing */
@@ -249,7 +276,7 @@ void my_func(size_t size) {
 /* Wrong */
 void
 my_func(size_t size) {
-    int32-t arr[size];  /* Wrong, do not use VLA */
+    int32_t arr[size];  /* Wrong, do not use VLA */
 }
 ```
 
@@ -278,10 +305,10 @@ if (is_ok == 0)     /* Wrong, use ! for negative check */
     - Use `uint8_t* ptr = func_returning_void_ptr();` instead
 - Always use `<` and `>` for C Standard Library include files, eg. `#include <stdlib.h>`
 - Always use `""` for custom libraries, eg. `#include "my_library.h"`
-- When casting to pointer type, always add space between type and asterisk, eg. `uint8_t* t = (uint8_t *)var_width_diff_type`
+- When casting to pointer type, always align asterisk to type, eg. `uint8_t* t = (uint8_t*)var_width_diff_type`
 - Always respect code style already used in project or library
 
-# Comments
+## Comments
 
 - Comments starting with `//` are not allowed. Always use `/* comment */`, even for single-line comment
 ```c
@@ -322,7 +349,7 @@ my_func(void) {
 }
 ```
 
-# Functions
+## Functions
 
 - Every function which may have access from outside its module, must include function *prototype* (or *declaration*)
 - Function name must be lowercase, optionally separated with underscore `_` character
@@ -336,26 +363,26 @@ void MYFunc(void);
 void myFunc();
 ```
 
-- When function returns pointer, add space between asterisk and data type
+- When function returns pointer, align asterisk to return type
 ```c
 /* OK */
-const char * my_func(void);
-my_struct_t * my_func(int32_t a, int32_t b);
+const char* my_func(void);
+my_struct_t* my_func(int32_t a, int32_t b);
 
 /* Wrong */
 const char *my_func(void);
-my_struct_t* my_func(void);
+my_struct_t * my_func(void);
 ```
 - Align all function prototypes (with the same/similar functionality) for better readability
 ```c
 /* OK, function names aligned */
 void        set(int32_t a);
 my_type_t   get(void);
-my_ptr_t *  get_ptr(void);
+my_ptr_t*   get_ptr(void);
 
 /* Wrong */
 void set(int32_t a);
-const char* get(void);
+const char * get(void);
 ```
 
 - Function implementation must include return type and optional other keywords in separate line
@@ -367,7 +394,7 @@ foo(void) {
 }
 
 /* OK */
-static const char *
+static const char*
 get_string(void) {
     return "Hello world!\r\n";
 }
@@ -378,10 +405,10 @@ int32_t foo(void) {
 }
 ```
 
-- When function returns pointer, asterisk character must include space between type and character (`char *`)
+- When function returns pointer, asterisk character must be aligned to return type (`char*`)
 ```c
 /* OK */
-const char *
+const char*
 foo(void) {
     return "test";
 }
@@ -393,7 +420,7 @@ foo(void) {
 }
 ```
 
-# Variables
+## Variables
 
 - Make variable name all lowercase with optional underscore `_` character
 ```c
@@ -455,7 +482,7 @@ char * a;
 char *p, *n;
 ```
 
-# Structures, enumerations, typedefs
+## Structures, enumerations, typedefs
 
 - Structure or enumeration name must be lowercase with optional underscore `_` character between words
 - Structure or enumeration may contain `typedef` keyword
@@ -534,7 +561,7 @@ a_t a = {1, 2};
 typedef uint8_t (*my_func_typedef_fn)(uint8_t p1, const char* p2);
 ```
 
-# Compound statements
+## Compound statements
 
 - Every compound statement must include opening and closing curly bracket, even if it includes only `1` nested statement
 - Every compound statement must include single indent; when nesting statements, include `1` indent size for each nest
@@ -768,7 +795,7 @@ switch (a) {
 }
 ```
 
-# Macros and preprocessor directives
+## Macros and preprocessor directives
 
 - Always use macros instead of literal constants, specially for numbers
 - All macros must be fully uppercase, with optional underscore `_` character, except if they are clearly marked as function which may be in the future replaced with regular function syntax
@@ -926,7 +953,7 @@ if (a) {                    /* If a is true */
 #endif /* !defined(XYZ) */
 ```
 
-# Documentation
+## Documentation
 
 Documented code allows doxygen to parse and general html/pdf/latex output, thus it is very important to do it properly.
 
@@ -1045,7 +1072,7 @@ get_data(const void* in) {
 #define MIN(x, y)       ((x) < (y) ? (x) : (y))
 ```
 
-# Header/source files
+## Header/source files
 
 - Leave single empty line at the end of file
 - Every file must include doxygen annotation for `file` and `brief` description followed by empty line (when using doxygen)
@@ -1136,3 +1163,22 @@ extern "C" {
 
 #endif /* TEMPLATE_HDR_H */
 ```
+
+## Artistic style configuration
+
+[AStyle](http://astyle.sourceforge.net/) is a great piece of software that can
+help with formatting the code based on input configuration.
+
+This repository contains `astyle-code-format.cfg` file which can be used with `AStyle` software.
+
+```
+astyle --options="astyle-code-format.cfg" "input_path/*.c,*.h" "input_path2/*.c,*.h"
+```
+
+## Eclipse formatter
+
+Repository contains `eclipse-ext-kr-format.xml` file that can be used with
+eclipse-based toolchains to set formatter options.
+
+It is based on K&R formatter with modifications to respect above rules.
+You can import it within eclipse settings, `Preferences -> LANGUAGE -> Code Style -> Formatter` tab.
